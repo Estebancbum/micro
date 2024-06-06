@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registro de Ingreso</title>
+</head>
+<body>
+    <form id="registroIngresoForm">
+        <label for="codigoEstudiante">Código del Estudiante:</label>
+        <input type="text" id="codigoEstudiante" name="codigoEstudiante" required><br>
+
+        <label for="nombreEstudiante">Nombre del Estudiante:</label>
+        <input type="text" id="nombreEstudiante" name="nombreEstudiante" required><br>
+
+        <label for="idPrograma">Programa:</label>
+        <select id="idPrograma" name="idPrograma" required>
+            <option value="1">Ing. Sistemas</option>
+            <option value="2">Ing. Multimedia</option>
+            <option value="3">Arquitectura</option>
+            <option value="4">Contabilidad</option>
+        </select><br>
+
+        <label for="fechaIngreso">Fecha de Ingreso:</label>
+        <input type="date" id="fechaIngreso" name="fechaIngreso" required><br>
+
+        <label for="horaIngreso">Hora de Ingreso:</label>
+        <input type="time" id="horaIngreso" name="horaIngreso" required><br>
+
+        <label for="horaSalida">Hora de Salida:</label>
+        <input type="time" id="horaSalida" name="horaSalida"><br>
+
+        <label for="idSala">Sala:</label>
+        <select id="idSala" name="idSala" required>
+            <option value="1">201G</option>
+            <option value="2">202H</option>
+            <option value="3">203I</option>
+            <option value="4">301G</option>
+            <option value="5">302H</option>
+            <option value="6">303I</option>
+        </select><br>
+
+        <label for="idResponsable">Responsable:</label>
+        <select id="idResponsable" name="idResponsable" required>
+            <option value="1">Juan Perez</option>
+            <option value="2">Ana Lopez</option>
+        </select><br>
+
+        <button type="submit">Registrar Ingreso</button>
+    </form>
+
+    <script>
+        document.getElementById('registroIngresoForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            data.fechaIngreso = `${data.fechaIngreso}T${data.horaIngreso}:00`;
+            if (data.horaSalida) {
+                data.horaSalida = `${data.fechaIngreso.split('T')[0]}T${data.horaSalida}:00`;
+            }
+
+            fetch('http://127.0.0.1:8000/ingresos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(error => { throw new Error(error.message); });
+                }
+                return response.json();
+            })
+            .then(result => {
+                alert('Ingreso registrado con éxito');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(`Ocurrió un error al registrar el ingreso: ${error.message}`);
+            });
+        });
+    </script>
+</body>
+</html>
